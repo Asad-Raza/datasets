@@ -301,10 +301,11 @@ class C4(tfds.core.BeamBasedBuilder):
           | "clean_pages" >> beam.FlatMap(c4_utils.get_clean_page_fn(badwords)))
       page_content = c4_utils.remove_duplicate_text(page_content)
 
-    # Filter out non-English pages. We do this after cleaning since it may
-    # change the predominate language.
-    page_content |= beam.Filter(
-        c4_utils.is_language, language=self.builder_config.lang)
+    # Optionally filter out non-English pages. We do this after cleaning since
+    # it may change the predominate language.
+    if self.builder_config.lang:
+      page_content |= beam.Filter(
+          c4_utils.is_language, language=self.builder_config.lang)
 
     return page_content
 
